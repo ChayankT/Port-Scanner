@@ -1,34 +1,38 @@
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 
+int valid_ip(const char *ip);
+
 int main() {
     char ip[100];
-    int start_port, end_port;
+    int port, end_port;
 
     printf("Enter target IP: ");
     scanf("%s", ip);
+    if(valid_ip(ip) == 1) {
+        printf("Invalid IP (IPv4 formed)\n");
+        return 1;
+    }
 
     printf("Enter start port: ");
-    scanf("%d", &start_port);
+    scanf("%d", &port);
 
     printf("Enter end port: ");
     scanf("%d", &end_port);
 
-    if (start_port < 1 || end_port > 65535 || start_port > end_port) {
+    if (port < 1 || end_port > 65535 || port > end_port) {
         printf("Invalid port range.\n");
         return 1;
     }
 
-    printf("\nScanning %s from port %d to %d...\n\n", ip, start_port, end_port);
+    printf("\nScanning %s from port %d to %d...\n\n", ip, port, end_port);
 
     int open_count = 0;
 
-    for (int port = start_port; port <= end_port; port++) {
+    for (; port <= end_port; port++) {
 
         int sock = socket(AF_INET, SOCK_STREAM, 0);
         if (sock < 0) {
@@ -55,4 +59,21 @@ int main() {
     printf("Total open ports: %d\n", open_count);
 
     return 0;
+}
+
+int valid_ip(const char *ip)
+{
+    int a,b,c,d;
+
+    if(sscanf(ip, "%d.%d.%d.%d", &a,&b,&c,&d) == 4)
+    {
+        if(a < 0 || a > 255)return 0;
+        if(b < 0 || b > 255)return 0;
+        if(c < 0 || c > 255)return 0;
+        if(d < 0 || d > 255)return 0;
+
+        return 0;
+    }
+
+    return 1;
 }
